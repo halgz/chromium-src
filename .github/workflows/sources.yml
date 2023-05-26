@@ -1,0 +1,80 @@
+name: Build
+on:
+  workflow_dispatch:
+  #schedule:
+    #- cron: '05 08 * * *'   #Runs at 08:05 UTC  https://docs.github.com/zh/actions/using-workflows/workflow-syntax-for-github-actions#onschedule
+    #- cron: '5 14,20 7 5 0' #Runs at 14:05 and 20:05, on day 7 of the month, and on Sunday, only in May. UTC (Two triggers: specific date, the day of the week)
+    #- cron: '5 02,08 8 5 *' #Runs at 02:05 and 08:05, on day 8 of the month, only in May. UTC (One trigger: specific date)
+    #- cron: '10 18 5 5 5'
+    #- cron: '15 0,6,12,18 6 5 6'
+
+jobs:
+  build-src:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Pre (show dev-info, get-binary)
+        run: |
+          export PATH=/c/msys64/usr/bin:$PATH
+          printf 'Processor: '; cat /proc/cpuinfo|grep processor|wc -l
+          cat /proc/cpuinfo|grep 'model name'|head -1; echo
+          cat /proc/meminfo | head
+          echo; uname -a
+          echo; swapon -v
+        shell: bash -e {0}
+
+      - name: Cleaning up storage
+        run: |
+          sudo rm -rf /opt/hostedtoolcache /usr/local/bin || true
+          df -Th
+        shell: bash -e {0}
+
+      - name: Get Sources
+        run: |
+          git config --global http.postBuffer 2147483648; git config --global advice.detachedHead false
+          ver="$(<VERSION)" || ver=main
+          git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          git clone --depth=1 https://chromium.googlesource.com/chromium/src.git -b "$ver"
+          echo; cat src/chrome/VERSION
+        shell: bash -e {0}
+
+      - name: RunRsync
+        run: |
+          export PATH="$PATH:$PWD/depot_tools" DEPOT_TOOLS_UPDATE=0 VPYTHON_BYPASS='manually managed python not supported by chrome operations'
+          echo '::Run gclient sync...'
+          mv gclient .gclient
+          gclient sync --no-history --nohooks --verbose
+        shell: bash -e {0}
+
+      - name: RunHooks
+        run: |
+          export PATH="$PATH:$PWD/depot_tools" DEPOT_TOOLS_UPDATE=0
+          export VPYTHON_BYPASS='manually managed python not supported by chrome operations'
+          echo '::Runhooks...'
+          src/build/util/lastchange.py -o src/build/util/LASTCHANGE
+          src/build/util/lastchange.py -m GPU_LISTS_VERSION --revision-id-only --header src/gpu/config/gpu_lists_version.h
+          src/build/util/lastchange.py -m SKIA_COMMIT_HASH -s src/third_party/skia --header src/skia/ext/skia_commit_hash.h
+          src/build/util/lastchange.py -s src/third_party/dawn --revision src/gpu/webgpu/DAWN_VERSION
+          #src/tools/update_pgo_profiles.py --target=linux update --gs-url-base=chromium-optimization-profiles/pgo_profiles
+          echo ' '; df -Th
+        shell: bash -e {0}
+
+      - name: Build
+        run: |
+          ver="$(<VERSION)" || ver=main
+          echo '::Deleting directories: .git...'; find src -type d -name .git -exec rm -rf {} +
+          echo '::Cleanup test data...'; bash -e source_cleanup_test no-android
+          echo "::Building chromium-$ver sources package..."; sudo chown $(id -u):$(id -g) -R /mnt
+          name="chromium-$ver"; mv src $name; tar cf - $name|xz -T0 >/mnt/chromium-$ver.tar.xz
+          (cd /mnt; ls -lh chromium-$ver.tar.xz); free -h
+          echo ' '; df -h
+        shell: bash -e {0}
+
+      - name: Upload
+        run: |
+          ver="$(<VERSION)" || ver=main
+          mv /mnt/chromium-$ver.tar.xz .
+          bash -e pushGit "chromium-$ver.tar.xz"
+        shell: bash -e {0}

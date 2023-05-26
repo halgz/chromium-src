@@ -1,0 +1,35 @@
+#!/bin/bash
+
+SRCDEST=src
+dirs=(
+chrome/test/data
+content/test/data
+media/test/data
+native_client/src/trusted/service_runtime/testdata
+third_party/blink/web_tests
+v8/test
+)
+# ./v8/test/torque/test-torque.tq
+
+_common() {
+	for i in ${dirs[@]}; do
+		find "${SRCDEST}/$i" -type f -not \( -name '*.gn*' -o -name test-torque.tq \) -delete
+		find "${SRCDEST}/$i" -xtype l -delete
+	done
+
+	if [ -d "${SRCDEST}/chrome/build/pgo_profiles" ]; then
+		find "${SRCDEST}/chrome/build/pgo_profiles" -type f -delete
+	fi
+}
+
+
+case "$1" in
+	no-android)
+		_common
+		find "${SRCDEST}/third_party/jdk/current" -type f -delete
+		find "${SRCDEST}/third_party/jdk/current" -xtype l -delete
+		;;
+	*)
+		_common
+		;;
+esac

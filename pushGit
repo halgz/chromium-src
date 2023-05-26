@@ -1,0 +1,75 @@
+#!/bin/bash
+
+ver="$(<VERSION)"
+TAG="${1%.tar.xz}"
+TAG="${TAG#chromium-}"
+archive="$1"
+export TZ='Asia/Shanghai'
+git config --local user.name 'github-actions'
+git config --local user.email 'noreply@github.com'
+
+_split() {
+	git checkout --orphan "$TAG"
+	git rm -rf .
+	echo
+
+	printf "Print information for file '${archive}' to file.list..."
+	file "${archive}" >file.list
+	ls -lh "${archive}" >>file.list
+	ls -l "${archive}" >>file.list
+	tar tvf "${archive}"|head -5000 >>file.list
+	printf 'done.\n\n'
+
+	split -d -b 100m "${archive}" "${archive}". --verbose
+	sha256sum "${archive}"* >sha256
+	sha512sum "${archive}"* >sha512
+	rm "${archive}"
+
+	for f in "${archive}"*; do echo $f >>filename; done
+}
+
+_push_tag() {
+	git add sha256 sha512
+	git add filename file.list
+
+	_push_github() {
+		local a f
+		while test $((a)) -lt 19; do
+			f="$(find . -name ${archive}.'[0-9]*'|sort|head -1)"
+			test -n "$f" || break
+			git add $f && rm $f
+			((a++)) || true
+		done
+		git commit -m "Pushed in $(date|sed -e 's/20[0-9][0-9]$//' -e 's/CST//')"
+		git tag "$TAG" --force
+		git push origin --tags --force || _retry_push
+	}
+
+	while true; do
+		_push_github
+		test -n "$(find . -name ${archive}.'[0-9]*')" || break
+	done
+
+}
+
+_retry_push() {
+	for ((i=1;i<=5;i++)); do
+		echo
+		echo "Retrying push... $i"
+		git config --global http.postBuffer 2147483648
+		git push --tags --force || echo "$?" >return
+	done
+	return $(<return)
+}
+
+_docmd() {
+    if [ -f "${archive}" ]; then
+		_split
+		_push_tag
+	else
+		echo "The file '${archive}' does not exist!"
+		exit 123
+	fi
+}
+
+_docmd

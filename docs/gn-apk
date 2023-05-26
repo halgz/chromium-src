@@ -1,0 +1,1251 @@
+gn args out/android64 --list --short >args.gn.all
+gn args out/android64 --list >args.gn.verbose
+
+gn check out/android64
+gn ls out/android64 >targets
+
+
+
+//android_webview:system_webview_32_apk
+//android_webview:system_webview_64_apk
+//android_webview:system_webview_apk
+//android_webview:system_webview_no_weblayer_apk
+//android_webview:trichrome_webview_32_apk
+//android_webview:trichrome_webview_64_32_apk
+//android_webview:trichrome_webview_64_apk
+//android_webview:trichrome_webview_apk
+//chrome/android:chrome_public_apk
+//chrome/android:monochrome_64_public_apk
+//chrome/android:monochrome_public_apk
+//chrome/android:trichrome_chrome_system_apk
+//chrome/android:trichrome_library_32_apk
+//chrome/android:trichrome_library_64_32_apk
+//chrome/android:trichrome_library_64_apk
+//chrome/android:trichrome_library_apk
+//chrome/android:trichrome_library_system_stub_apk
+
+
+//android_webview:system_webview_bundle
+//android_webview:system_webview_64_bundle
+//android_webview:system_webview_32_bundle
+
+//android_webview:system_webview_bundle_apks
+//android_webview:system_webview_64_bundle_apks
+//android_webview:system_webview_32_bundle_apks
+
+
+//android_webview:system_webview_32_bundle_apks
+//android_webview:system_webview_64_bundle_apks
+//android_webview:system_webview_bundle_apks
+//android_webview:trichrome_webview_32_bundle_apks
+//android_webview:trichrome_webview_64_32_bundle_apks
+//android_webview:trichrome_webview_64_bundle_apks
+//android_webview:trichrome_webview_bundle_apks
+//chrome/android:monochrome_32_public_bundle_apks
+//chrome/android:monochrome_64_32_public_bundle_apks
+//chrome/android:monochrome_64_public_bundle_apks
+//chrome/android:monochrome_public_bundle_apks
+//chrome/android:trichrome_chrome_32_bundle_apks
+//chrome/android:trichrome_chrome_64_32_bundle_apks
+//chrome/android:trichrome_chrome_64_bundle_apks
+//chrome/android:trichrome_chrome_bundle_apks
+
+
+================================================================================================================
+target_cpu = "arm64"
+————————————————————————————————————
+
+>>>  ninja -C out/android64 monochrome_64_public_apk      // 纯64位库
+ninja: Entering directory `out/android64'
+[10 37/110482 48.838s] CXX obj/buildtools/third_party/libc++abi/libc++abi/cxa_personality.o
+
+>>>  ninja -C out/android64 monochrome_public_apk      //64+32 位库; 默认32位，MT 强改64后，浏览器是64位，webview 64 正常，32闪退
+ninja: Entering directory `out/android64'
+[10 10/102434 12.430s] CXX obj/buildtools/third_party/libc++abi/libc++abi/cxa_thread_atexit.o
+
+
+
+https://chromium.googlesource.com/chromium/src/+/HEAD/docs/android_native_libraries.md
+
+
+
+apks
+————————————————————————————————————
+
+>>>  ninja -C out/android64 monochrome_64_public_bundle_apks      // 纯64位库; 32位 webview 调用会出错，64位调用正常 (如via)
+ninja: Entering directory `out/android64'
+[10 0/110519 6.780s] CXX obj/base/allocator/partition_allocator/partition_alloc/page_allocator_internals_posix.o
+
+>>>  ninja -C out/android64 monochrome_64_32_public_bundle_apks      //64+32 位库; 默认64位
+ninja: Entering directory `out/android64'
+[10 0/110537 6.695s] CXX obj/base/allocator/partition_allocator/partition_alloc/page_allocator_internals_posix.o
+
+>>>  ninja -C out/android64 monochrome_32_public_bundle_apks      // 纯32位库; 64位 webview 调用会出错 (如via)，32位调用正常
+ninja: Entering directory `out/android64'
+[10 0/102498 6.599s] CXX obj/base/allocator/partition_allocator/partition_alloc/page_allocator_internals_posix.o
+
+>>>  ninja -C out/android64 monochrome_public_bundle_apks      //64+32 位库; 默认32位
+ninja: Entering directory `out/android64'
+[10 0/102511 6.695s] CXX obj/base/allocator/partition_allocator/partition_alloc/page_allocator_internals_posix.o
+
+
+
+
+
+====================================================
+
+>>>  ninja -C out/android64 system_webview_64_apk
+ninja: Entering directory `out/android64'
+[10 55/48513 14.995s] CXX obj/components/enterprise/common/strings/strings.o
+
+>>>  ninja -C out/android64 system_webview_apk
+ninja: Entering directory `out/android64'
+[10 13/86571 8.316s] ACTION //android_webview/proto:aw_variations_seed_proto_java__protoc_java(//build/toolchain/android:android_clang_arm64)
+
+>>>  ninja -C out/android64 system_webview_32_apk
+ninja: Entering directory `out/android64'
+[10 93/86551 14.614s] CXX obj/base/allocator/partition_allocator/partition_alloc/gwp_asan_support.o
+
+>>>  ninja -C out/android64 system_webview_no_weblayer_apk
+ninja: Entering directory `out/android64'
+[10 0/46414 6.030s] CXX obj/base/allocator/partition_allocator/partition_alloc/oom_callback.o
+
+
+apks
+————————————————————————————————————
+>>>  ninja -C out/android64 system_webview_32_bundle_apks
+ninja: Entering directory `out/android64'
+[10 25/86495 21.372s] CXX obj/base/allocator/partition_allocator/partition_alloc/random.o
+
+>>>  ninja -C out/android64 system_webview_64_bundle_apks
+ninja: Entering directory `out/android64'
+[10 17/48378 16.585s] CXX obj/base/allocator/partition_allocator/partition_alloc/page_allocator_internals_posix.o
+
+>>>  ninja -C out/android64 system_webview_bundle_apks
+ninja: Entering directory `out/android64'
+[10 4/86473 6.838s] CXX obj/base/allocator/partition_allocator/partition_alloc/page_allocator_internals_posix.o
+
+
+
+
+
+——————————————————————————————————————————————————————
+>>>  gn desc out/android64 //android_webview:system_webview_apk
+Target //android_webview:system_webview_apk
+type: group
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/SystemWebView.apk"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:libwebviewchromium(//build/toolchain/android:android_clang_arm)
+  //android_webview:libwebviewchromium
+  //android_webview:system_webview_apk__apk_operations
+  //android_webview:system_webview_apk__build_config_crbug_908819
+  //android_webview:system_webview_apk__copy_arsc
+  //android_webview:system_webview_apk__copy_rtxt
+  //android_webview:system_webview_apk__create
+  //android_webview:system_webview_apk__java
+  //android_webview:system_webview_apk__java__validate
+  //android_webview:system_webview_apk__size_info
+
+
+
+
+
+——————————————————————————————————————————————————————
+>>> gn desc out/android64 //android_webview:system_webview_64_apk
+Target //android_webview:system_webview_64_apk
+type: group
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/SystemWebView64.apk"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:libwebviewchromium
+  //android_webview:system_webview_64_apk__apk_operations
+  //android_webview:system_webview_64_apk__build_config_crbug_908819
+  //android_webview:system_webview_64_apk__copy_arsc
+  //android_webview:system_webview_64_apk__copy_rtxt
+  //android_webview:system_webview_64_apk__create
+  //android_webview:system_webview_64_apk__java
+  //android_webview:system_webview_64_apk__java__validate
+  //android_webview:system_webview_64_apk__size_info
+
+
+
+
+
+——————————————————————————————————————————————————————
+>>>  gn desc out/android64 //android_webview:system_webview_32_apk
+Target //android_webview:system_webview_32_apk
+type: group
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/SystemWebView32.apk"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:libwebviewchromium(//build/toolchain/android:android_clang_arm)
+  //android_webview:system_webview_32_apk__apk_operations
+  //android_webview:system_webview_32_apk__build_config_crbug_908819
+  //android_webview:system_webview_32_apk__copy_arsc
+  //android_webview:system_webview_32_apk__copy_rtxt
+  //android_webview:system_webview_32_apk__create
+  //android_webview:system_webview_32_apk__java
+  //android_webview:system_webview_32_apk__java__validate
+  //android_webview:system_webview_32_apk__size_info
+
+
+
+
+
+——————————————————————————————————————————————————————
+>>>  gn desc out/android64 //chrome/android:monochrome_public_apk
+Target //chrome/android:monochrome_public_apk
+type: group
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/MonochromePublic.apk"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:monochrome
+  //chrome/android:monochrome_public_apk__apk_operations
+  //chrome/android:monochrome_public_apk__build_config_crbug_908819
+  //chrome/android:monochrome_public_apk__copy_arsc
+  //chrome/android:monochrome_public_apk__copy_rtxt
+  //chrome/android:monochrome_public_apk__create
+  //chrome/android:monochrome_public_apk__java
+  //chrome/android:monochrome_public_apk__java__validate
+  //chrome/android:monochrome_public_apk__size_info
+  //chrome/android:monochrome_secondary_abi_lib
+
+
+
+
+
+——————————————————————————————————————————————————————
+  >>>  gn desc out/android64 //chrome/android:monochrome_64_public_apk
+Target //chrome/android:monochrome_64_public_apk
+type: group
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/MonochromePublic64.apk"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //chrome/android:libmonochrome_64
+  //chrome/android:monochrome_64_public_apk__apk_operations
+  //chrome/android:monochrome_64_public_apk__build_config_crbug_908819
+  //chrome/android:monochrome_64_public_apk__copy_arsc
+  //chrome/android:monochrome_64_public_apk__copy_rtxt
+  //chrome/android:monochrome_64_public_apk__create
+  //chrome/android:monochrome_64_public_apk__java
+  //chrome/android:monochrome_64_public_apk__java__validate
+  //chrome/android:monochrome_64_public_apk__size_info
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //chrome/android:monochrome_64_public_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/MonochromePublic64.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android64/apks/MonochromePublic64.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/MonochromePublic64.aab
+  --output
+  apks/MonochromePublic64.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android64/apks/MonochromePublic64.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //chrome/android:monochrome_64_public_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //chrome/android:monochrome_32_public_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/MonochromePublic32.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android64/apks/MonochromePublic32.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/MonochromePublic32.aab
+  --output
+  apks/MonochromePublic32.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android64/apks/MonochromePublic32.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //chrome/android:monochrome_32_public_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //chrome/android:monochrome_64_32_public_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/MonochromePublic6432.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android64/apks/MonochromePublic6432.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/MonochromePublic6432.aab
+  --output
+  apks/MonochromePublic6432.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android64/apks/MonochromePublic6432.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //chrome/android:monochrome_64_32_public_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //chrome/android:monochrome_public_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/MonochromePublic.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android64/apks/MonochromePublic.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/MonochromePublic.aab
+  --output
+  apks/MonochromePublic.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android64/apks/MonochromePublic.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //chrome/android:monochrome_public_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //android_webview:system_webview_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android/apks/SystemWebView.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android/apks/SystemWebView.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/SystemWebView.aab
+  --output
+  apks/SystemWebView.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android/apks/SystemWebView.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:system_webview_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //android_webview:system_webview_64_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android/apks/SystemWebView64.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android/apks/SystemWebView64.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/SystemWebView64.aab
+  --output
+  apks/SystemWebView64.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android/apks/SystemWebView64.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:system_webview_64_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //android_webview:system_webview_32_bundle_apks
+type: action
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android/apks/SystemWebView32.apks"
+    ]
+  }
+
+testonly
+  false
+
+public
+  [All headers listed in the sources are public.]
+
+inputs
+  //out/android/apks/SystemWebView32.aab
+  //third_party/android_build_tools/bundletool/bundletool.jar
+  //third_party/jinja2/__init__.py
+  //third_party/jinja2/_identifier.py
+  //third_party/jinja2/async_utils.py
+  //third_party/jinja2/bccache.py
+  //third_party/jinja2/compiler.py
+  //third_party/jinja2/defaults.py
+  //third_party/jinja2/environment.py
+  //third_party/jinja2/exceptions.py
+  //third_party/jinja2/filters.py
+  //third_party/jinja2/idtracking.py
+  //third_party/jinja2/lexer.py
+  //third_party/jinja2/loaders.py
+  //third_party/jinja2/nodes.py
+  //third_party/jinja2/optimizer.py
+  //third_party/jinja2/parser.py
+  //third_party/jinja2/runtime.py
+  //third_party/jinja2/tests.py
+  //third_party/jinja2/utils.py
+  //third_party/jinja2/visitor.py
+  //third_party/markupsafe/__init__.py
+  //third_party/markupsafe/_compat.py
+  //third_party/markupsafe/_native.py
+  //build/gn_helpers.py
+  //build/print_python_deps.py
+  //build/android/pylib/__init__.py
+  //build/android/pylib/utils/__init__.py
+  //build/android/pylib/utils/app_bundle_utils.py
+  //build/android/gyp/bundletool.py
+  //build/android/gyp/create_app_bundle_apks.py
+  //build/android/gyp/util/__init__.py
+  //build/android/gyp/util/build_utils.py
+  //build/android/gyp/util/md5_check.py
+  //build/android/gyp/util/resource_utils.py
+
+all_dependent_configs (in order applying, try also --tree)
+  //base/allocator:wrap_malloc_symbols
+  //base:perfetto_config
+  //third_party/perfetto/gn:public_config
+  //third_party/libyuv:libyuv_config
+  //third_party/jsoncpp:jsoncpp_config
+  //third_party/libwebp:libwebp_config
+  //ui/gl:gl_config
+  //third_party/khronos:khronos_headers
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config
+  //third_party/dawn/include/dawn:public
+  //device/bluetooth:bluetooth_config
+  //components/policy/proto:proto_internal_config
+  //components/password_manager/core/browser:password_reuse_detection_config
+  //base/allocator:wrap_malloc_symbols(//build/toolchain/android:android_clang_arm)
+  //base:perfetto_config(//build/toolchain/android:android_clang_arm)
+  //third_party/perfetto/gn:public_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libyuv:libyuv_config(//build/toolchain/android:android_clang_arm)
+  //third_party/jsoncpp:jsoncpp_config(//build/toolchain/android:android_clang_arm)
+  //third_party/libwebp:libwebp_config(//build/toolchain/android:android_clang_arm)
+  //ui/gl:gl_config(//build/toolchain/android:android_clang_arm)
+  //third_party/khronos:khronos_headers(//build/toolchain/android:android_clang_arm)
+  //third_party/vulkan-deps/vulkan-headers/src:vulkan_headers_config(//build/toolchain/android:android_clang_arm)
+  //third_party/dawn/include/dawn:public(//build/toolchain/android:android_clang_arm)
+  //device/bluetooth:bluetooth_config(//build/toolchain/android:android_clang_arm)
+  //components/policy/proto:proto_internal_config(//build/toolchain/android:android_clang_arm)
+  //components/password_manager/core/browser:password_reuse_detection_config(//build/toolchain/android:android_clang_arm)
+
+script
+  //build/android/gyp/create_app_bundle_apks.py
+
+args
+  --bundle
+  apks/SystemWebView32.aab
+  --output
+  apks/SystemWebView32.apks
+  --aapt2-path
+  ../../third_party/android_build_tools/aapt2/aapt2
+  --keystore-path
+  ../../build/android/chromium-debug.keystore
+  --keystore-name
+  chromiumdebugkey
+  --keystore-password
+  chromium
+
+outputs
+  //out/android/apks/SystemWebView32.apks
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //android_webview:system_webview_32_bundle__bundle
+
+
+
+
+
+——————————————————————————————————————————————————————
+Target //weblayer/shell/android:browser_sandbox_apk
+type: group
+toolchain: //build/toolchain/android:android_clang_arm64
+
+visibility
+  *
+
+metadata
+  {
+    install_artifacts = [
+      "//out/android64/apks/WESandbox.apk"
+    ]
+  }
+
+testonly
+  true
+
+public
+  [All headers listed in the sources are public.]
+
+Direct dependencies (try also "--all", "--tree", or even "--all --tree")
+  //weblayer/shell/android:browser_sandbox_apk__apk_operations
+  //weblayer/shell/android:browser_sandbox_apk__copy_arsc
+  //weblayer/shell/android:browser_sandbox_apk__copy_rtxt
+  //weblayer/shell/android:browser_sandbox_apk__create
+  //weblayer/shell/android:browser_sandbox_apk__java
+  //weblayer/shell/android:browser_sandbox_apk__java__validate

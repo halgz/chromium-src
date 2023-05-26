@@ -1,0 +1,80 @@
+#!/bin/bash -eu
+
+if ((EUID==0)); then echo "Donot run this as Root!"; exit 1; fi
+DEST="/tmp/wintoolchain"
+
+_remove() {
+local a=0
+read -r -p "Are You Sure Delete the directory: $DEST? [Y/n] " input
+while ((a==0)); do
+	case $input in
+		[yY][eE][sS]|[yY])
+			printf "Delete $DEST..."
+			rm -rf $DEST
+			printf "done.\n"
+			a=1
+			;;
+		[nN][oO]|[nN])
+			echo "You must delete '$DEST' that already exists"
+			read -r -p "Enter again: [Y/n] " input
+			;;
+		*)
+			echo "Invalid input..."
+			read -r -p "Enter again: [Y/n] " input
+			;;
+	esac
+done
+}
+
+_retry_push() {
+	local a=$2 b=$3
+	for ((i=1;i<=b;i++)); do
+		echo
+		echo "Retrying push... $i"
+		$1 || echo "$?" >return
+	done
+	echo
+	if [  $a = 0 ] && [ -f return ]; then rm return; fi
+	if [  $a != 0 ] && [ -f return ]; then return $(<return); fi
+}
+
+
+if [ -n "$*" ]; then
+	file="$1"
+	[ ! -d $DEST ] || _remove
+
+	mkdir -p ${DEST}/.git
+	cp "$file" ${DEST}
+
+	pushd ${DEST} >/dev/null
+	echo "$(basename ${file%.zip})" >filename
+	mv "$(basename $file)" win_sdk
+	sha512sum "win_sdk" >sha512
+	split -d -b 100m win_sdk 'win_sdk.' --verbose
+	rm win_sdk
+	b2sum win_sdk.[0-9]* >b2.hash
+
+	cat <<EOF>.git/config
+[user]
+        name = halgz
+        email = halgz@users.noreply.github.com
+[remote "origin"]
+        url = github3:halgz/chromium-src.git
+EOF
+
+	git init
+	git add win_sdk.[0-9]*
+	git add sha512 b2.hash filename
+	echo -e '\ncommit message example:\n\nVS 2022 Community 17.5.5\nWindows SDK 10.0.22621.755\n'
+	sleep 5
+	git commit
+	echo
+	git tag "win_toolchain"
+	#git push --delete origin win_toolchain ||  _retry_push "git push --delete origin win_toolchain" 0 1
+	git push --tag --force || _retry_push "git push --tag --force" 1 5
+	popd  >/dev/null
+	rm -rf ${DEST}
+else
+	echo "No specified file!"
+	exit 1
+fi

@@ -1,0 +1,132 @@
+name: Args
+on:
+  workflow_dispatch:
+  push:
+    branches: main
+    paths:
+      - '/args/**'
+  #schedule:
+    #- cron: '05 08 * * *'   #Runs at 08:05 UTC  https://docs.github.com/zh/actions/using-workflows/workflow-syntax-for-github-actions#onschedule
+    #- cron: '5 14,20 7 5 0' #Runs at 14:05 and 20:05, on day 7 of the month, and on Sunday, only in May. UTC (Two triggers: specific date, the day of the week)
+    #- cron: '5 02,08 8 5 *' #Runs at 02:05 and 08:05, on day 8 of the month, only in May. UTC (One trigger: specific date)
+    #- cron: '10 18 5 5 5'
+    #- cron: '15 0,6,12,18 6 5 6'
+
+jobs:
+  args-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Pre (show dev-info, get-binary)
+        run: |
+          export PATH=/c/msys64/usr/bin:$PATH
+          printf 'Processor: '; cat /proc/cpuinfo|grep processor|wc -l
+          cat /proc/cpuinfo|grep 'model name'|head -1; echo
+          cat /proc/meminfo | head
+          echo; uname -a
+          echo; swapon -v
+        shell: bash -e {0}
+
+      - name: Cleaning up storage
+        run: |
+          sudo rm -rf /opt/hostedtoolcache /usr/local/{bin,share} || true
+          df -hT
+        shell: bash -e {0}
+
+      - name: Get Sources
+        run: |
+          ver="$(<VERSION)" || ver=main
+          git config --global advice.detachedHead false
+          git clone --depth=1 https://chromium.googlesource.com/chromium/tools/depot_tools.git
+          git clone --depth=1 https://chromium.googlesource.com/chromium/src.git -b "$ver"
+          echo; cat src/chrome/VERSION
+        shell: bash -e {0}
+
+      - name: RunRsync
+        run: |
+          export PATH="$PATH:$PWD/depot_tools" DEPOT_TOOLS_UPDATE=0
+          export VPYTHON_BYPASS='manually managed python not supported by chrome operations'
+          echo '::Run gclient sync...'
+          mv gclient .gclient
+          echo "target_os = [ 'android', 'win' ]" >>.gclient
+          gclient sync --no-history --nohooks --verbose
+        shell: bash -e {0}
+
+      - name: WinToolchain
+        run: |
+          git clone --depth=1 https://github.com/halgz/chromium-src.git -b "win_toolchain" WinToolchain
+          cd WinToolchain; echo ' '; b2sum -c b2.hash
+          echo ' '; cat win_sdk.[0-9]* >win_sdk
+          echo ' '; sha512sum -c sha512
+          echo ' '; rm -fv win_sdk.[0-9]*
+          mv -v win_sdk "$(<filename).zip"
+          sudo apt-get update &>/dev/null
+          sudo apt-get install libfuse2 gperf -y &>/dev/null
+
+      - name: RunHooks
+        run: |
+          export PATH="$PATH:$PWD/depot_tools" DEPOT_TOOLS_UPDATE=0
+          export VPYTHON_BYPASS='manually managed python not supported by chrome operations'
+          export DEPOT_TOOLS_WIN_TOOLCHAIN_BASE_URL="$PWD/WinToolchain"; grep '^TOOLCHAIN_HASH' src/build/vs_toolchain.py|sed 's/\s//g' >tmpp; . ./tmpp
+          export GYP_MSVS_HASH_${TOOLCHAIN_HASH}="$(<$PWD/WinToolchain/filename)"; rm ./tmpp
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN_BASE_URL:: $DEPOT_TOOLS_WIN_TOOLCHAIN_BASE_URL"
+          echo "GYP_MSVS_HASH_${TOOLCHAIN_HASH}:: $(env|grep GYP_MSVS_HASH)"
+          echo '::Run gclient Runhooks...'
+          gclient runhooks --verbose
+          echo ' '; df -Th
+        shell: bash -e {0}
+
+      - name: Get Binary
+        run: bash -e binary
+
+      - name: Set args (Android)
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          mkdir -p src/out/android
+          cp args/args.apk.gn src/out/android/args.gn
+          gn gen src/out/android --root=src || true
+        shell: bash -e {0}
+
+      - name: Set args (Linux)
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          mkdir -p src/out/linux
+          cp args/args.linux.gn src/out/linux/args.gn
+          gn gen src/out/linux --root=src || true
+        shell: bash -e {0}
+
+      - name: Set args (Windows)
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          mkdir -p src/out/windows
+          cp args/args.win.gn src/out/windows/args.gn
+          gn gen src/out/windows --root=src || true
+        shell: bash -e {0}
+
+      - name: Try build (Android)
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          export NINJA_STATUS="[%r %f/%t] "
+          ninja -C src/out/android weblayer_locales || true
+        shell: bash -e {0}
+
+      - name: Try build (Linux)
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          export NINJA_STATUS="[%r %f/%t] "
+          ninja -C src/out/linux packed_resources_locales || true
+        shell: bash -e {0}
+
+      - name: Try build (Windows)
+        run: |
+          export PATH="$PWD/bin:$PATH"
+          export NINJA_STATUS="[%r %f/%t] "
+          ninja -C src/out/windows base || true
+        shell: bash -e {0}
+
+      - name: Run Custom Script
+        run: |
+          test -f run && bash -e run || true
+        shell: bash -e {0}
